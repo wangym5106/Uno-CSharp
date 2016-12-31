@@ -11,7 +11,7 @@ namespace Uno
         public int numberOfPlayers { get; private set; }
         private List<List<Card>> hand;
         private List<Card> deck;
-        private List<Card> discard;
+        public List<Card> discard { get; private set; }
         public int currentPlayer { get; private set; }
         public int prevPlayer { get; private set; }
         public string lastColor { get; private set; }
@@ -191,22 +191,23 @@ namespace Uno
             }       
         }
 
-        public void AutoPlay()
+        public Card AutoPlay()
         {
             if (gameOver)
-                return;
+                return null;
             if (canPlay)
             {
                 for (int idx = 0; idx < GetHand(currentPlayer).Count; idx++)
                     if (Play(currentPlayer, idx) && !gameOver)
                     {
                         Next();
-                        return;
+                        return discard.Last();
                     }
             }
             Draw(currentPlayer);
             Pass(currentPlayer);
             Next();
+            return null;
         }
 
         public bool Next()

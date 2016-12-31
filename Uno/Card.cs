@@ -39,5 +39,18 @@ namespace Uno
         {
             return color + symbol;
         }
+
+        public string getResourceUri()
+        {
+            string colorName = color.ToLower();
+            string symbolName = symbol.ToLower();
+            if (symbol.Equals("Draw2"))
+                symbolName = "picker";
+            if (symbol.Equals("Draw4"))
+                symbolName = "pick_four";
+            if (symbol.Equals("Wild"))
+                symbolName = "colora_changer";
+            return string.Format("pack://application:,,,/Resources/{0}_{1}_large.png", colorName, symbolName);
+        }
     }
 }

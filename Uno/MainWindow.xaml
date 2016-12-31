@@ -26,6 +26,7 @@
                 <Label x:Name="challenge_label" Content="challenge" Canvas.Left="580" Canvas.Top="479" FontSize="20" Foreground="White" Visibility="Hidden"/>
                 <Label x:Name="win_label" Content="win" Canvas.Left="580" Canvas.Top="479" FontSize="20" Foreground="White" Visibility="Hidden"/>
                 <Label x:Name="lose_label" Content="lose" Canvas.Left="580" Canvas.Top="479" FontSize="20" Foreground="White" Visibility="Hidden"/>
+                <Label x:Name="pass_label" Content="pass" Canvas.Left="580" Canvas.Top="479" FontSize="20" Foreground="White" Visibility="Hidden" MouseUp="pass_label_MouseUp"/>
             </Canvas>
         </Viewbox>
     </Grid>

@@ -12,8 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-
 using System.Windows.Media.Animation;
+
 
 namespace Uno
 {
@@ -30,6 +30,8 @@ namespace Uno
         public int num { get; set; }
 
         public List<Image> imgs { get; set; }
+
+        private UnoGame game;
 
         private int numOfZindex = 20;
 
@@ -54,6 +56,8 @@ namespace Uno
         private double discard_left1 = 300.0;
 
         private double discard_left2 = 400.0;
+
+        private double[,] players_top_left = new double[4,2] { { 0, 0 }, { 288, 832 }, { 51, 648}, { 126, 87} };
 
         private double player1_top = 288.0;
 
@@ -99,14 +103,16 @@ namespace Uno
             double top = ran.Next((int)discard_top1, (int)discard_top2);
             int angle = ran.Next(-30, 30);
 
-
-
             Image i = (Image)e.Source;
+            if (game.currentPlayer != 0 || !game.canPlay) { return; }
+            if (!game.Play(0,imgs.IndexOf((Image)i))) { return; }
+
+
             FloatInElement(top, left, i);
             //i.SetValue(Canvas.TopProperty, top);
             //i.SetValue(Canvas.LeftProperty, left);
             i.RenderTransform = new RotateTransform(angle, i.ActualWidth / 2, i.ActualHeight / 2);
-            Canvas.SetZIndex(i, ++numOfZindex);
+            //Canvas.SetZIndex(i, ++numOfZindex);
 
             /*
             Image i = (Image)e.Source;
@@ -125,6 +131,17 @@ namespace Uno
             i.MouseUp -= img_MouseUp;
             //canvas.Children.Remove(i);
             refresh();
+
+            if (game.gameOver)
+            {
+                gameover();
+            }
+            if (!game.lastColor.Equals("Wild"))
+            {
+                game.Next();
+                autoplay_show();
+                
+            }
             
         }
 
@@ -143,19 +160,20 @@ namespace Uno
 
 
 
-        private void init_imgs(int n = 20)
+        private void init_imgs(int n = 7)
         {
             try
             {
+                List<Card> hand = game.GetHand(0);
                 imgs = new List<Image>();
                 for (int i = 0; i < n; i++)
                 {
                     Image img_i = new Image();
                     img_i.Height = 100;
-                    img_i  .Width = 100;
+                    img_i .Width = 100;
                     img_i.SetValue(Canvas.TopProperty, hand_down_top);
-                    img_i.SetValue(Canvas.LeftProperty, (double)(125 + (500 / n) * i));
-                    img_i.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/blue_0_large.png"));
+                    img_i.SetValue(Canvas.LeftProperty, (double)(125 + (500 / n) * i)); 
+                    img_i.Source = new BitmapImage(new Uri(hand[i].getResourceUri()));
                     img_i.MouseEnter += img_MouseEnter;
                     img_i.MouseLeave += img_MouseLeave;
                     img_i.MouseUp += img_MouseUp;
@@ -163,6 +181,17 @@ namespace Uno
                     imgs.Add(img_i);
                     canvas.Children.Add(imgs[i]);
                 }
+                Image img_first = new Image();
+                img_first.Height = 100;
+                img_first.Width = 100;
+                img_first.SetValue(Canvas.TopProperty, discard_top1);
+                img_first.SetValue(Canvas.LeftProperty, discard_left1);
+                img_first.Source = new BitmapImage(new Uri(game.discard.Last().getResourceUri()));
+                
+                canvas.Children.Add(img_first);
+
+                //refresh();
+
             }
             catch (Exception ee) { }
         }
@@ -171,16 +200,22 @@ namespace Uno
         {
             for (int i = 0; i < imgs.Count; i++)
             {
-
+                //canvas.Children.Remove(imgs[i]);
                 imgs[i].SetValue(Canvas.LeftProperty, (double)(125 + (500 / imgs.Count) * i));
-
+                //canvas.Children.Add(imgs[i]);
             }
         }
 
-        private void draw(int n = 1)
+        private void draw()
         {
+            if (game.currentPlayer != 0) { return; }
+            if (!game.canDraw) { return; }
+            List<Card> cards = game.Draw(0);
+            int n = cards.Count;
+
             try
             {
+                
                 int angle = ran.Next(-30, 30);
                 for (int i = 0; i < n; i++)
                 {
@@ -202,13 +237,17 @@ namespace Uno
                     img_t.Width = 100;
                     img_t.SetValue(Canvas.TopProperty, hand_down_top);
                     img_t.SetValue(Canvas.LeftProperty, hand_donw_right);
-                    img_t.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/green_0_large.png"));
+                    img_t.Source = new BitmapImage(new Uri(cards[i].getResourceUri()));
                     img_t.Visibility = Visibility.Hidden;
+
+                    img_t.MouseEnter += img_MouseEnter;
+                    img_t.MouseLeave += img_MouseLeave;
+                    img_t.MouseUp += img_MouseUp;
                     imgs.Add(img_t);
                     canvas.Children.Add(img_t);
 
                     //canvas.Children.Add(imgs[imgs.Count - 1]);
-                    FloatInElement( hand_down_top, hand_donw_right, img_i);
+                    FloatInElement( hand_down_top, hand_donw_right, img_i, i);
 
                     
                     //imgs.Add(img_i);
@@ -223,13 +262,28 @@ namespace Uno
             }
             catch (Exception ee) { }
             
+            if (game.canPass) { pass_label.Visibility = Visibility.Visible; }
         }
 
         private void play()
         { }
 
-        private void othersPlay(int playerIndex)
-        { }
+        private void othersPlay(int playerIndex, string cardURI, int count)
+        {
+            try
+            {
+                Image img = new Image();
+                img.Height = 100;
+                img.Width = 100;
+                img.SetValue(Canvas.TopProperty, players_top_left[playerIndex, 0]);
+                img.SetValue(Canvas.LeftProperty, players_top_left[playerIndex, 1]);
+                img.Source = new BitmapImage(new Uri(cardURI));
+                canvas.Children.Add(img);
+
+                FloatInElement(ran.Next((int)discard_top1, (int)discard_top2), ran.Next((int)discard_left1, (int)discard_left2), img, count);
+            }
+            catch (Exception ee) { }
+        }
 
         private void deck_MouseUp(object sender, MouseButtonEventArgs e)
         {
@@ -241,12 +295,20 @@ namespace Uno
         private void chooseColor()
         { }
         private void gameover()
-        { }
+        {
+            if (game.winner == 0)
+            { win_label.Visibility = Visibility.Visible; }
+            else
+            { lose_label.Visibility = Visibility.Visible; }
+        }
         private void restart()
         { }
 
         private void start_MouseUp(object sender, MouseButtonEventArgs e)
         {
+            game = new UnoGame(4);
+
+
             start.Visibility = Visibility.Hidden;
             //color_blue.Visibility = Visibility.Visible;
             //color_green.Visibility = Visibility.Visible;
@@ -256,38 +318,42 @@ namespace Uno
             player1.Visibility = Visibility.Visible;
             player2.Visibility = Visibility.Visible;
             player3.Visibility = Visibility.Visible;
-            init_card();
+            //init_card();
             init_imgs();
 
 
+            
         }
 
-        public void FloatInElement(double top, double left, UIElement elem)
+        public void FloatInElement(double top, double left, UIElement elem, int beginTime = 0)
          {
-             try
+            Canvas.SetZIndex(elem, Canvas.GetZIndex(player1) - 1);
+            
+            try
              {
                  DoubleAnimation floatY = new DoubleAnimation()
                  {
+                     BeginTime = new TimeSpan(0, 0, 0, beginTime, 0),
                      To = top,
                      Duration = new TimeSpan(0, 0, 0, 0, 300),
                  };
                  DoubleAnimation floatX = new DoubleAnimation()
                  {
+                     BeginTime = new TimeSpan(0, 0, 0, beginTime, 0),
                      To = left,
                      Duration = new TimeSpan(0, 0, 0, 0, 300),
                  };
 
                 floatX.Completed += (s, e) =>
                 {
+                    Canvas.SetZIndex(elem, ++numOfZindex);
                     if (floatY.To > 450.0)
                     {
                         canvas.Children.Remove(elem);
                         foreach(Image img in imgs)
                         {
                             img.Visibility = Visibility.Visible;
-                            img.MouseEnter += img_MouseEnter;
-                            img.MouseLeave += img_MouseLeave;
-                            img.MouseUp += img_MouseUp;
+                        
                         }
 
                         refresh();
@@ -312,6 +378,30 @@ namespace Uno
             canvas.Background = b;
         }
 
-       
+        private void pass_label_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (game.currentPlayer != 0) { return; }
+            if (!game.canPass) { return; }
+            game.Pass(0);
+            game.Next();
+            pass_label.Visibility = Visibility.Hidden;
+            autoplay_show();
+        }
+
+        private void autoplay_show()
+        {
+            int count = 0;
+            while (game.currentPlayer != 0)
+            {
+                count++;
+                Card card = game.AutoPlay();
+                if (card != null)
+                {
+                    othersPlay(game.prevPlayer, card.getResourceUri(), count);
+                }
+
+
+            }
+        }
     }
 }
