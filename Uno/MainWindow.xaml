@@ -5,8 +5,28 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Uno"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="750" Width="1000">
     <Grid>
-        
+        <Viewbox Stretch="Fill">
+
+            <Canvas Name="canvas" Width="1000" Height="750">
+                <Canvas.Background>
+                    <ImageBrush ImageSource="Resources/gameplay2.png"/>
+                </Canvas.Background>
+
+                <Image x:Name="deck" HorizontalAlignment="Left" Height="100" VerticalAlignment="Top" Width="100" Source="Resources/card_back_alt_large.png" MouseUp="deck_MouseUp" Canvas.Left="55" Canvas.Top="407" Visibility="Hidden"/>
+                <Image x:Name="player1" Height="100" Canvas.Left="832" Canvas.Top="288" Width="100" Source="Resources/card_back_large.png" Visibility="Hidden"/>
+                <Image x:Name="player2" Height="100" Canvas.Left="648" Canvas.Top="51" Width="100" Source="Resources/card_back_large.png" Visibility="Hidden"/>
+                <Image x:Name="player3" Height="100" Canvas.Left="87" Canvas.Top="126" Width="100" Source="Resources/card_back_large.png" Visibility="Hidden"/>
+                <Image x:Name="color_blue" Height="40" Canvas.Left="220" Canvas.Top="479" Width="57" Source="/Resources/color_blue.png" Visibility="Hidden"/>
+                <Image x:Name="color_red" Height="40" Canvas.Left="250" Canvas.Top="479" Width="57" Source="/Resources/color_red.png" Visibility="Hidden"/>
+                <Image x:Name="color_green" Height="40" Canvas.Left="280" Canvas.Top="479" Width="57" Source="/Resources/color_green.png" Visibility="Hidden"/>
+                <Image x:Name="color_yellow" Height="40" Canvas.Left="310" Canvas.Top="479" Width="57" Source="/Resources/color_yellow.png" Visibility="Hidden"/>
+                <Image x:Name="start" Height="100" Canvas.Left="461" Canvas.Top="307" Width="100" Source="/Resources/card_back_alt_large.png" MouseUp="start_MouseUp"/>
+                <Label x:Name="challenge_label" Content="challenge" Canvas.Left="580" Canvas.Top="479" FontSize="20" Foreground="White" Visibility="Hidden"/>
+                <Label x:Name="win_label" Content="win" Canvas.Left="580" Canvas.Top="479" FontSize="20" Foreground="White" Visibility="Hidden"/>
+                <Label x:Name="lose_label" Content="lose" Canvas.Left="580" Canvas.Top="479" FontSize="20" Foreground="White" Visibility="Hidden"/>
+            </Canvas>
+        </Viewbox>
     </Grid>
 </Window>
