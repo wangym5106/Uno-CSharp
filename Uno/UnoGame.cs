@@ -76,8 +76,8 @@ namespace Uno
             int initialCardIdx = 0;
             while (!char.IsDigit(deck[initialCardIdx].symbol[0]))
                 initialCardIdx += 1;
-            discard.Add(deck[0]);
-            deck.RemoveAt(0);
+            discard.Add(deck[initialCardIdx]);
+            deck.RemoveAt(initialCardIdx);
 
             isReversed = false;
             currentPlayer = 0;
@@ -95,6 +95,11 @@ namespace Uno
         public List<Card> GetHand(int player)
         {
             return hand[player];
+        }
+
+        public int GetHandCount(int player)
+        {
+            return hand[player].Count;
         }
 
         public List<Card> Draw(int player)
@@ -133,7 +138,7 @@ namespace Uno
                 return false;
             }
             Card card = hand[player][cardIdx];
-            if (card.color.Equals(lastColor) || card.symbol.Equals(discard.Last().symbol))
+            if (card.color.Equals(lastColor) || card.color.Equals("Wild") || card.symbol.Equals(discard.Last().symbol))
             {
                 if (card.symbol.Equals("Skip"))
                 {
@@ -200,12 +205,43 @@ namespace Uno
                 for (int idx = 0; idx < GetHand(currentPlayer).Count; idx++)
                     if (Play(currentPlayer, idx) && !gameOver)
                     {
+                        if (lastColor.Equals("Wild"))
+                        {
+                            string wcolor = "Blue";
+                            foreach (Card ccard in GetHand(currentPlayer))
+                            {
+                                if (!ccard.Equals("Wild"))
+                                    wcolor = ccard.color;
+                            }
+                            setWildColor(currentPlayer, wcolor);
+                        }
                         Next();
                         return discard.Last();
                     }
+                Draw(currentPlayer);
+                if (Play(currentPlayer, GetHand(currentPlayer).Count - 1))
+                {
+                    if (lastColor.Equals("Wild"))
+                    {
+                        string wcolor = "Blue";
+                        foreach (Card ccard in GetHand(currentPlayer))
+                        {
+                            if (!ccard.Equals("Wild"))
+                                wcolor = ccard.color;
+                        }
+                        setWildColor(currentPlayer, wcolor);
+                    }
+                    Next();
+                    return discard.Last();
+                }
+                Pass(currentPlayer);
+                Next();
+                return null;
             }
-            Draw(currentPlayer);
-            Pass(currentPlayer);
+            if (canDraw)
+            {
+                Draw(currentPlayer);
+            }         
             Next();
             return null;
         }
