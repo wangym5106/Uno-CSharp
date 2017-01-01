@@ -213,6 +213,16 @@ namespace Uno {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
+        internal static System.Drawing.Bitmap Clockwise_arrow_svg {
+            get {
+                object obj = ResourceManager.GetObject("Clockwise_arrow_svg", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
         internal static System.Drawing.Bitmap color_blue {
             get {
                 object obj = ResourceManager.GetObject("color_blue", resourceCulture);
@@ -246,6 +256,16 @@ namespace Uno {
         internal static System.Drawing.Bitmap color_yellow {
             get {
                 object obj = ResourceManager.GetObject("color_yellow", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap Counterclockwise_arrow_svg {
+            get {
+                object obj = ResourceManager.GetObject("Counterclockwise_arrow_svg", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

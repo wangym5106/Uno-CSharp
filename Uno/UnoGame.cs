@@ -109,6 +109,8 @@ namespace Uno
                 return null;
             }
             int cardCount = (drawCount > 0) ? drawCount : 1;
+            if (cardCount == 1)
+                canPass = true;
             if (deck.Count < cardCount)
             {
                 Card last = discard.Last();
@@ -126,7 +128,6 @@ namespace Uno
             }
             hand[player].AddRange(cards);
             canDraw = false;
-            canPass = true;
             drawCount = 0;
             return cards;
         }
